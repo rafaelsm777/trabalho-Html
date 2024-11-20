@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Cachorros</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container my-5">
+        <h2 class="mb-4">Lista de Cachorros</h2>
+        
+        <!-- Botão para adicionar cachorro -->
+        <button class="btn btn-primary mb-3" onclick="adicionarCachorro()">Adicionar Cachorro</button>
+
+        <!-- Tabela de Cachorros -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Nome do Cachorro</th>
+                    <th>Nome do(a) Dono(a)</th>
+                    <th>Telefone</th>
+                    <th>Email</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="cachorrosTableBody">
+                <!-- Os dados serão carregados via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal para Adicionar/Editar Cachorro -->
+    <div class="modal fade" id="cachorroModal" tabindex="-1" aria-labelledby="cachorroModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cachorroModalLabel">Adicionar/Editar Cachorro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="cachorroForm">
+                        <div class="mb-3">
+                            <label for="nomeCachorro" class="form-label">Nome do Cachorro</label>
+                            <input type="text" class="form-control" id="nomeCachorro" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nomeDono" class="form-label">Nome do Dono(a)</label>
+                            <input type="text" class="form-control" id="nomeDono" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="telefone" class="form-label">Telefone</label>
+                            <input type="text" class="form-control" id="telefone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fotoUrl" class="form-label">URL da Foto</label>
+                            <input type="url" class="form-control" id="fotoUrl" placeholder="https://exemplo.com/foto.jpg" required>
+                        </div>
+                        <input type="hidden" id="cachorroId">
+                        <button type="button" class="btn btn-primary" onclick="salvarCachorro()">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript e Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simulação de dados via API
+        let cachorros = [
+   { id: 1,
+        nome: "Rex",
+        dono: "Ana Silva",
+        telefone: "(11) 91234-5678",
+        email: "ana.silva@example.com",
+        fotoUrl: "https://placedog.net/500/280?random=1"
+    },
+    { id: 2,
+        nome: "Bolt",
+        dono: "Bruno Costa",
+        telefone: "(11) 92345-6789",
+        email: "bruno.costa@example.com",
+        fotoUrl: "https://placedog.net/500/280?random=2"
+    },
+    { id: 3,
+        nome: "Luna",
+        dono: "Carla Ferreira",
+        telefone: "(11) 93456-7890",
+        email: "carla.ferreira@example.com",
+        fotoUrl: "https://placedog.net/500/280?random=3"
+    },
+    { id: 4,
+        nome: "Max",
+        dono: "Daniel Souza",
+        telefone: "(11) 94567-8901",
+        email: "daniel.souza@example.com",
+        fotoUrl: "https://placedog.net/500/280?random=4"
+    },
+    { id: 5,
+        nome: "Bella",
+        dono: "Eduarda Rocha",
+        telefone: "(11) 95678-9012",
+        email: "eduarda.rocha@example.com",
+        fotoUrl: "https://placedog.net/500/280?random=5"
+    },
+    { id: 6,
+        nome: "Thor",
+        dono: "Felipe Oliveira",
+        telefone: "(11) 96789-0123",
+        email: "felipe.oliveira@example.com",
+        fotoUrl: "https://placedog.net/500/280?random=6"
+    },
+    { id: 7,
+        cachorro: "Molly",
+        dono: "Gabriela Mendes",
+        telefone: "(11) 97890-1234",
+        email: "gabriela.mendes@example.com",
+        fotoUrl: "https://placedog.net/500/280?random=7"
+    },
+    { id: 8,
+        nome: "Buddy",
+        dono: "Henrique Lima",
+        telefone: "(11) 98901-2345",
+        email: "henrique.lima@example.com",
+        fotoUrl: "https://placedog.net/500/280?random=8"
+    },
+    { id: 9,
+        nome: "Daisy",
+        dono: "Isabela Martins",
+        telefone: "(11) 99012-3456",
+        email: "isabela.martins@example.com",
+        fotoUrl: "https://placedog.net/500/280?random=9"
+    },
+    { id: 10,
+        nome: "Charlie",
+        dono: "João Almeida",
+        telefone: "(11) 90123-4567",
+        email: "joao.almeida@example.com",
+        fotoUrl: "https://placedog.net/500/280?random=10"
+    }
+        ];
+
+        // Função para carregar cachorros na tabela
+        function carregarCachorros() {
+            const tableBody = document.getElementById('cachorrosTableBody');
+            tableBody.innerHTML = '';
+            cachorros.forEach(cachorro => {
+                const row = `
+                    <tr>
+                        <td><img src="${cachorro.fotoUrl}" alt="Foto de ${cachorro.nome}" style="max-width: 100px;"></td>
+                        <td>${cachorro.nome}</td>
+                        <td>${cachorro.dono}</td>
+                        <td>${cachorro.telefone}</td>
+                        <td>${cachorro.email}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editarCachorro(${cachorro.id})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="excluirCachorro(${cachorro.id})">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        // Função para adicionar cachorro
+        function adicionarCachorro() {
+            document.getElementById('cachorroForm').reset();
+            document.getElementById('cachorroId').value = '';
+            new bootstrap.Modal(document.getElementById('cachorroModal')).show();
+        }
+
+        // Função para salvar cachorro
+        function salvarCachorro() {
+            const id = document.getElementById('cachorroId').value;
+            const nome = document.getElementById('nomeCachorro').value;
+            const dono = document.getElementById('nomeDono').value;
+            const telefone = document.getElementById('telefone').value;
+            const email = document.getElementById('email').value;
+            const fotoUrl = document.getElementById('fotoUrl').value;
+
+            if (id) {
+                const index = cachorros.findIndex(cachorro => cachorro.id == id);
+                cachorros[index] = { id: Number(id), nome, dono, telefone, email, fotoUrl };
+            } else {
+                const newId = cachorros.length ? cachorros[cachorros.length - 1].id + 1 : 1;
+                cachorros.push({ id: newId, nome, dono, telefone, email, fotoUrl });
+            }
+
+            carregarCachorros();
+            bootstrap.Modal.getInstance(document.getElementById('cachorroModal')).hide();
+        }
+
+        // Função para editar cachorro
+        function editarCachorro(id) {
+            const cachorro = cachorros.find(cachorro => cachorro.id == id);
+            document.getElementById('cachorroId').value = cachorro.id;
+            document.getElementById('nomeCachorro').value = cachorro.nome;
+            document.getElementById('nomeDono').value = cachorro.dono;
+            document.getElementById('telefone').value = cachorro.telefone;
+            document.getElementById('email').value = cachorro.email;
+            document.getElementById('fotoUrl').value = cachorro.fotoUrl;
+            new bootstrap.Modal(document.getElementById('cachorroModal')).show();
+        }
+
+        // Função para excluir cachorro
+        function excluirCachorro(id) {
+            cachorros = cachorros.filter(cachorro => cachorro.id != id);
+            carregarCachorros();
+        }
+
+        // Carregar cachorros ao iniciar a página
+        window.onload = carregarCachorros;
+    </script>
+</body>
+</html>
